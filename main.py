@@ -28,6 +28,7 @@ class avail:
 
 class Mission:
     __currentNode__: None
+    __missionAttribs__: {'name': None}
     
     lua: None
     flags: flags()
@@ -35,25 +36,18 @@ class Mission:
 
     def __init__(self, xmlfile):
         self.doc = parse(xmlfile)
-    
-    def getTags(self):
-        if self.__missionTags__ != None:
-            return self.__missionTags__
-        
-        self.__missionTags__ = []
-        m = self.getRootElement().getElementsByTagName('mission')
-        self.name = m.getAttribute('name')
-        
-        self.lua = self.getRootElement().getElementsByTagName('lua')[0].childNodes[0].wholeText
+        self.__missionAttribs__["name"] = self.doc.getRootElement().getAttribute('name')
+   
+        self.lua = self.doc.getRootElement().getElementsByTagName('lua')[0].childNodes[0].wholeText
         
         try:
-            self.getRootElement().getElementsByTagName('flags')[0].childNodes[1].tagName
+            self.doc.getRootElement().getElementsByTagName('flags')[0].childNodes[1].tagName
         except:
             self.flags.unique = False
         else:
             self.flags.unique = True
         
-        for availTag in self.getRootElement().getElementsByTagName('avail').childNodes:
+        for availTag in self.doc.getRootElement().getElementsByTagName('avail').childNodes:
             if availTag.nodeType == availTag.TEXT_NODE:
                 continue
             elif availTag.tagName == 'cond':
@@ -61,7 +55,8 @@ class Mission:
             elif availTag.tagName == 'done':
             elif availTag.tagName == 'location':
                 locations = [ 'None', 'Computer', 'Bar', 'Outfit', 'Shipyard', 'Land', 'Commodity' ]
-                if availTag.childNodes[0].wholeText in locations:
+                if availTag.childNodes[0].wholeText not in locations:
+                    sys.stderr.write("Unknow value '%s' for 'location' child of avail tag for mission %s" % (availTag.childNodes[0].wholeText, self.getName()))
             elif availTag.tagName == 'Faction':
             elif availTag.tagName == 'Planet':
             else:
@@ -69,7 +64,7 @@ class Mission:
             
     
     def getName(self):
-        self.doc.
+        return self.__missionAttribs__["name"]
 
 class TransformXmlToMissions:
     __missionList__ = None
