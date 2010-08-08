@@ -71,6 +71,16 @@ class Mission:
 
     def getName(self):
         return self.__missionAttribs__["name"]
+        
+    def getLua(self):
+        return self.lua
+    
+    def isUnique(self):
+        return self.flags.unique
+
+    def getAvail(self,Node=None):
+        if Node != None:
+            return self.avail.Node
 
 class TransformXmlToMissions:
     __missionList__ = None
@@ -95,7 +105,16 @@ class TransformXmlToMissions:
         rootxml = ET.Element('Missions')
         for mission in self.__missionList__:
             child = ET.Element('mission', name=mission.getName())
-            
+            child.
+    def tostring(self):
+        for mission in self.__missionList__:
+            sys.stdout.write('Name: %s' % (mission.getName())
+            sys.stdout.write('Lua: %s' % (mission.getLua())
+            if mission.isUnique() == True:
+                sys.stdout.write('+Is unique')
+            sys.stdout.write('Avail:')
+            for availTag in mission.getAvail():
+                sys.stdout.write('%s: %s' % (availTag['key'], availTag['value'])
     
     def ignore_filename(self,filename):
         root, ext = os.path.splitext(filename)
