@@ -11,28 +11,28 @@ import re
 __version__ = '1.0'
 
 class flags:
-    unique: None
+    unique = None
 
     def __init__(self):
         pass
 
 class avail:
-    chance: None
-    cond: None
-    done: None
-    location: None
-    faction: {}
+    chance = None
+    cond = None
+    done = None
+    location = None
+    faction = {}
     
     def __init__(self):
         pass
 
 class Mission:
-    __currentNode__: None
-    __missionAttribs__: {'name': None}
+    __currentNode__ = None
+    __missionAttribs__ = {'name': None}
     
-    lua: None
-    flags: flags()
-    avail: avail()
+    lua = None
+    flags = flags()
+    avail = avail()
 
     def __init__(self, xmlfile):
         self.doc = parse(xmlfile)
