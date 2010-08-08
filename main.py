@@ -10,64 +10,50 @@ import re
 
 __version__ = '1.0'
 
-class flags:
-    unique = None
-
-    def __init__(self):
-        pass
-
-class avail:
-    chance = None
-    cond = None
-    done = None
-    location = []
-    faction = []
-    planet = []
-    
-    def __init__(self):
-        pass
-
 class Mission:
     __currentNode__ = None
     __missionAttribs__ = {'name': None}
     
-    lua = None
-    flags = flags()
-    avail = avail()
-
     def __init__(self, xmlfile):
         self.doc = parse(xmlfile)
         self.__missionAttribs__["name"] = self.getRootElement().getAttribute('name')
    
         self.lua = self.getRootElement().getElementsByTagName('lua')[0].childNodes[0].wholeText
         
+        self.flags = {'unique': None}
         try:
             self.getRootElement().getElementsByTagName('flags')[0].childNodes[1].tagName
         except:
-            self.flags.unique = False
+            self.flags['unique'] = False
         else:
-            self.flags.unique = True
+            self.flags['unique'] = True
         
+        self.avail = { 'chance': None,
+                       'cond': None,
+                       'done': None,
+                       'location': [],
+                       'faction': [],
+                       'planet': []}
         for availTag in self.getRootElement().getElementsByTagName('avail')[0].childNodes:
             if availTag.nodeType == availTag.TEXT_NODE:
                 continue
             elif availTag.tagName == 'cond':
-                self.avail.cond = availTag.childNodes[0].wholeText
+                self.avail['cond'] = availTag.childNodes[0].wholeText
             elif availTag.tagName == 'chance':
-                self.avail.chance = availTag.childNodes[0].wholeText
+                self.avail['chance'] = availTag.childNodes[0].wholeText
             elif availTag.tagName == 'done':
-                self.avail.done = availTag.childNodes[0].wholeText
+                self.avail['done'] = availTag.childNodes[0].wholeText
             elif availTag.tagName == 'location':
                 locations = [ 'None', 'Computer', 'Bar', 'Outfit', 'Shipyard', 'Land', 'Commodity' ]
                 if availTag.childNodes[0].wholeText not in locations:
                     sys.stderr.write("Unknow value '%s' for 'location' child of avail tag for mission %s\n"
                             % (availTag.childNodes[0].wholeText, self.getName()))
                 else:
-                    self.avail.location.append(availTag.childNodes[0].wholeText)
+                    self.avail['location'].append(availTag.childNodes[0].wholeText)
             elif availTag.tagName == 'faction':
-                self.avail.faction.append(availTag.childNodes[0].wholeText)
+                self.avail['faction'].append(availTag.childNodes[0].wholeText)
             elif availTag.tagName == 'planet':
-                self.avail.planet.append(availTag.childNodes[0].wholeText)
+                self.avail['planet'].append(availTag.childNodes[0].wholeText)
             else:
                 sys.stderr.write("Unknow child %s of avail tag for mission %s" % (availTag.tagName, self.getName()))
 
@@ -84,7 +70,7 @@ class Mission:
         return self.lua
     
     def isUnique(self):
-        return self.flags.unique
+        return self.flags['unique']
 
     def getAvail(self,Node=None):
         if Node != None:
@@ -93,12 +79,12 @@ class Mission:
             else:
                 return None
         else:
-            return {'chance': self.avail.chance,
-                    'cond': self.avail.cond,
-                    'done': self.avail.done,
-                    'location': self.avail.location,
-                    'planet': self.avail.planet,
-                    'faction': self.avail.faction
+            return {'chance': self.avail['chance'],
+                    'cond': self.avail['cond'],
+                    'done': self.avail['done'],
+                    'location': self.avail['location'],
+                    'planet': self.avail['planet'],
+                    'faction': self.avail['faction']
                    }
 
 class TransformXmlToMissions:
@@ -116,9 +102,10 @@ class TransformXmlToMissions:
                 if self.ignore_filename(filename):
                     continue
                 if re.match(".*(\.xml)$", f):
-                    sys.stdout.write("Processing %s\n" % (filename))
+                    print "Processing %s" % (filename)
                     self.__missionList__.append(Mission(filename))
-        sys.stdout.write("Done\n")
+                    m = None
+        print "Done"
     
     def writeMissionsXml(self, output=None):
         rootxml = ET.Element('Missions')
@@ -128,13 +115,14 @@ class TransformXmlToMissions:
 
     def tostring(self):
         for mission in self.__missionList__:
-            sys.stdout.write("Name: %s\n" % mission.getName())
-            sys.stdout.write("Lua: %s\n" % mission.getLua())
+            print "Name: %s" % mission.getName()
+            print "Lua: %s" % mission.getLua()
             if mission.isUnique() == True:
-                sys.stdout.write("+Is unique\n")
-            sys.stdout.write("Avail:\n")
+                print "+Is unique"
+            print "Avail:"
             for key, val in mission.getAvail().items():
-                sys.stdout.write("   %s: %s\n" % (key, val))
+                print "   %s: %s" % (key, val)
+            print
     
     def ignore_filename(self,filename):
         root, ext = os.path.splitext(filename)
