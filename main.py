@@ -129,7 +129,7 @@ class TransformXmlToMissions:
         if output:
             tree.write(output,'utf-8')
         else:
-            ET.tostring(rootxml,'utf-8')
+            ET.dump(rootxml)
 
     def tostring(self):
         for mission in self.__missionList__:
