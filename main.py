@@ -51,18 +51,24 @@ class Mission:
             if availTag.nodeType == availTag.TEXT_NODE:
                 continue
             elif availTag.tagName == 'cond':
+                self.avail.cond = availTag.childNodes[0].wholeText
             elif availTag.tagName == 'chance':
+                self.avail.chance = availTag.childNodes[0].wholeText
             elif availTag.tagName == 'done':
+                self.avail.done = availTag.childNodes[0].wholeText
             elif availTag.tagName == 'location':
                 locations = [ 'None', 'Computer', 'Bar', 'Outfit', 'Shipyard', 'Land', 'Commodity' ]
                 if availTag.childNodes[0].wholeText not in locations:
                     sys.stderr.write("Unknow value '%s' for 'location' child of avail tag for mission %s" % (availTag.childNodes[0].wholeText, self.getName()))
-            elif availTag.tagName == 'Faction':
-            elif availTag.tagName == 'Planet':
+                else:
+                    self.avail.location[] = availTag.childNodes[0].wholeText
+            elif availTag.tagName == 'action':
+                self.avail.faction = availTag.childNodes[0].wholeText
+            elif availTag.tagName == 'planet':
+                self.avail.planet = availTag.childNodes[0].wholeText
             else:
                 sys.stderr.write("Unknow child %s of avail tag for mission %s" % (availTag.tagName, self.getName()))
-            
-    
+
     def getName(self):
         return self.__missionAttribs__["name"]
 
@@ -81,14 +87,14 @@ class TransformXmlToMissions:
                 if re.match(".*(\.xml)$", f) and !self.ignore_filename(filename):
                     sys.stdout.write("Processing %s" % (filename))
                     sys.stdout.flush()
-                    self.__missionList__[f] = Mission(filename)
+                    self.__missionList__[] = Mission(filename)
         sys.stdout.write("Done")
         sys.stdout.flush()
     
     def writeMissionsXml(self, output=None):
         rootxml = ET.Element('Missions')
         for mission in self.__missionList__:
-            child = ET.Element('mission',name=mission.getName()
+            child = ET.Element('mission', name=mission.getName())
             
     
     def ignore_filename(self,filename):
@@ -119,5 +125,5 @@ a big xml.
         parser.error("incorrect number of arguments")
 
     local_path = args[0]
-    local_files = TransformXmlToMission(local_path)
+    local_files = TransformXmlToMissions(local_path)
     
