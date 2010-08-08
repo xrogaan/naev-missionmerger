@@ -121,9 +121,10 @@ class TransformXmlToMissions:
             for key, val in mission.getAvail().items():
                 if val:
                     etkey = ET.SubElement(avail, key)
-                    if ListType(val):
+                    if type(val) is ListType():
                         etkey.text = val[0]
                     else:
+                        print "type: %s -> %s" % (type(val), val)
                         etkey.text = val
         tree = ET.ElementTree(rootxml)
         if output:
