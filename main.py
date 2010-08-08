@@ -60,7 +60,7 @@ class Mission:
             elif availTag.tagName == 'location':
                 locations = [ 'None', 'Computer', 'Bar', 'Outfit', 'Shipyard', 'Land', 'Commodity' ]
                 if availTag.childNodes[0].wholeText not in locations:
-                    sys.stderr.write("Unknow value '%s' for 'location' child of avail tag for mission %s"
+                    sys.stderr.write("Unknow value '%s' for 'location' child of avail tag for mission %s\n"
                             % (availTag.childNodes[0].wholeText, self.getName()))
                 else:
                     self.avail.location.append(availTag.childNodes[0].wholeText)
@@ -116,11 +116,9 @@ class TransformXmlToMissions:
                 if self.ignore_filename(filename):
                     continue
                 if re.match(".*(\.xml)$", f):
-                    sys.stdout.write("Processing %s" % (filename))
-                    sys.stdout.flush()
+                    sys.stdout.write("Processing %s\n" % (filename))
                     self.__missionList__.append(Mission(filename))
-        sys.stdout.write("Done")
-        sys.stdout.flush()
+        sys.stdout.write("Done\n")
     
     def writeMissionsXml(self, output=None):
         rootxml = ET.Element('Missions')
@@ -130,18 +128,13 @@ class TransformXmlToMissions:
 
     def tostring(self):
         for mission in self.__missionList__:
-            sys.stdout.write('Name: %s' % mission.getName())
-            sys.stdout.flush()
-            sys.stdout.write('Lua: %s' % mission.getLua())
-            sys.stdout.flush()
+            sys.stdout.write("Name: %s\n" % mission.getName())
+            sys.stdout.write("Lua: %s\n" % mission.getLua())
             if mission.isUnique() == True:
-                sys.stdout.write('+Is unique')
-                sys.stdout.flush()
-            sys.stdout.write('Avail:')
-            sys.stdout.flush()
+                sys.stdout.write("+Is unique\n")
+            sys.stdout.write("Avail:\n")
             for key, val in mission.getAvail().items():
-                sys.stdout.write('%s: %s' % (key, val))
-                sys.stdout.flush()
+                sys.stdout.write("   %s: %s\n" % (key, val))
     
     def ignore_filename(self,filename):
         root, ext = os.path.splitext(filename)
