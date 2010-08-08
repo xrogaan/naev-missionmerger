@@ -3,7 +3,7 @@
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
 
 import sys, os
-from xml.etree.ElementTree import Element, ElementTree
+import xml.etree.ElementTree as ET
 from optparse import OptionParser
 import re
 
@@ -17,6 +17,12 @@ def get_local_files(localpath,Verbose=True):
             print os.path.join(root, f)
             if re.match("(\.xml)$", f):
                 localfiles.append(os.path.join(root,f))
+
+def parse_local_files(localfiles, Verbose=True):
+    root = ET.Element("Missions")
+    for xmlfile in localfiles:
+        ET.SubElement(root, ET.parse(xmlfile))
+    tree = ET.ElementTree(root)
 
 
 if __name__ == "__main__":
