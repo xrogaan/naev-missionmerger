@@ -68,9 +68,6 @@ class Mission:
     def getName(self):
         return self.Attribs["name"]
         
-    def getLua(self):
-        return self.lua
-    
     def isUnique(self):
         return self.flags['unique']
 
@@ -137,7 +134,7 @@ class TransformXmlToMissions:
     def tostring(self):
         for mission in self.__missionList__:
             print "Name: %s" % mission.getName()
-            print "Lua: %s" % mission.getLua()
+            print "Lua: %s" % mission.lua()
             if mission.isUnique() == True:
                 print "+Is unique"
             print "Avail:"
