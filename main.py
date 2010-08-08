@@ -13,14 +13,14 @@ __version__ = '1.0'
 
 class Mission:
     __currentNode__ = None
-    __missionAttribs__ = {'name': None}
     
     def __init__(self, xmlfile):
         self.doc = parse(xmlfile)
-        self.__missionAttribs__["name"] = self.getRootElement().getAttribute('name')
+        self.Attribs = {}
+        self.Attribs["name"] = self.getRootElement().getAttribute('name')
    
         self.lua = self.getRootElement().getElementsByTagName('lua')[0].childNodes[0].wholeText
-        
+       
         self.flags = {'unique': None}
         try:
             self.getRootElement().getElementsByTagName('flags')[0].childNodes[1].tagName
@@ -35,6 +35,7 @@ class Mission:
                        'location': [],
                        'faction': [],
                        'planet': []}
+        
         for availTag in self.getRootElement().getElementsByTagName('avail')[0].childNodes:
             if availTag.nodeType == availTag.TEXT_NODE:
                 continue
@@ -65,7 +66,7 @@ class Mission:
 
 
     def getName(self):
-        return self.__missionAttribs__["name"]
+        return self.Attribs["name"]
         
     def getLua(self):
         return self.lua
@@ -120,11 +121,12 @@ class TransformXmlToMissions:
             avail = ET.SubElement(child, 'avail')
             for key, val in mission.getAvail().items():
                 if val:
-                    etkey = ET.SubElement(avail, key)
-                    if type(val) is ListType():
-                        etkey.text = val[0]
+                    if type(val) is ListType:
+                        for item in val:
+                            etkey = ET.SubElement(avail, key)
+                            etkey.text = val[0]
                     else:
-                        print "type: %s -> %s" % (type(val), val)
+                        etkey = ET.SubElement(avail, key)
                         etkey.text = val
         tree = ET.ElementTree(rootxml)
         if output:
