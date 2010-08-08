@@ -3,6 +3,7 @@
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
 
 import sys, os
+from types import *
 from optparse import OptionParser
 from xml.dom.minidom import parse
 import xml.etree.ElementTree as ET
@@ -110,8 +111,25 @@ class TransformXmlToMissions:
     def writeMissionsXml(self, output=None):
         rootxml = ET.Element('Missions')
         for mission in self.__missionList__:
-            child = ET.Element('mission', name=mission.getName())
-
+            child = ET.SubElement(rootxml, 'mission', name=mission.getName())
+            lua = ET.SubElement(child, 'lua')
+            lua.text=mission.lua
+            if (mission.isUnique()):
+                flags = ET.SubElement(child, 'flags')
+                ET.SubElement(flags, 'unique')
+            avail = ET.SubElement(child, 'avail')
+            for key, val in mission.getAvail().items():
+                if val:
+                    etkey = ET.SubElement(avail, key)
+                    if ListType(val):
+                        etkey.text = val[0]
+                    else:
+                        etkey.text = val
+        tree = ET.ElementTree(rootxml)
+        if output:
+            tree.write(output,'utf-8')
+        else:
+            ET.tostring(rootxml,'utf-8')
 
     def tostring(self):
         for mission in self.__missionList__:
@@ -153,5 +171,9 @@ a big xml.
 
     local_path = args[0]
     local_files = TransformXmlToMissions(local_path)
-    local_files.tostring()
     
+    local_files.writeMissionsXml(cfg.output)
+
+
+
+
