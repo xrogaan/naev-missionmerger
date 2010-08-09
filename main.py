@@ -15,9 +15,11 @@ class debug:
     """
     Simple objet to help show verbose level of text.
     """
+    _verbose = None
 
     def __init__(self, verbose=False):
-        self._verbose = verbose
+        if self._verbose == None:
+            self._verbose = verbose
 
     def toggleVerbose(self):
         if self._verbose:
@@ -69,8 +71,13 @@ class Asset:
 
 class Mission:
     __currentNode__ = None
+    Factions
+    Asset
 
-    def __init__(self, xmlfile):
+    def __init__(self, xmlfile, Factions, Asset):
+        self.Factions = Factions
+        self.Asset = Asset
+
         self.debug = debug()
         self.doc = parse(xmlfile)
         self.Attribs = {}
@@ -110,9 +117,15 @@ class Mission:
                 else:
                     self.avail['location'].append(availTag.childNodes[0].wholeText)
             elif availTag.tagName == 'faction':
-                self.avail['faction'].append(availTag.childNodes[0].wholeText)
+                if self.Factions.findFaction(availTag.childNodes[0].wholeText):
+                    self.avail['faction'].append(availTag.childNodes[0].wholeText)
+                else:
+                    print "Error: faction %s didn't exists" % availTag.childNodes[0].wholeText
             elif availTag.tagName == 'planet':
-                self.avail['planet'].append(availTag.childNodes[0].wholeText)
+                if self.Asset.findPlanet(availTag.childNodes[0].wholeText):
+                    self.avail['planet'].append(availTag.childNodes[0].wholeText)
+                else:
+                    print "Error: planet %s didn't exists" % availTag.childNodes[0].wholeText
             else:
                 sys.stderr.write("Unknow child %s of avail tag for mission %s" % (availTag.tagName, self.getName()))
 
@@ -152,7 +165,10 @@ class TransformXmlToMissions:
         self.readXml(localpath)
 
     def readXml(self, localpath):
+        datpath = os.path.abspath(os.path.normpath(localpath + "/../"))
         localpath = os.path.abspath(os.path.normpath(localpath))
+        assets = Asset(os.path.join(datpath, 'asset.xml'))
+        factions = Factions(os.path.join(datpath, 'faction.xml'))
         for root, dirs, files in os.walk(localpath):
             for f in files:
                 filename = os.path.join(root, f)
@@ -160,7 +176,10 @@ class TransformXmlToMissions:
                     continue
                 if re.match(".*(\.xml)$", f):
                     self.debug.p("Processing %s" % (filename))
-                    self.__missionList__.append(Mission(filename))
+                    self.__missionList__.append(Mission(filename,
+                                                    factions,
+                                                    assets
+                                                ))
                     m = None
         self.debug.p("Done")
 
