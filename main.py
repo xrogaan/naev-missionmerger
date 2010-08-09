@@ -29,6 +29,44 @@ class debug:
         if self._verbose:
             print text
 
+class Factions:
+    factionData = None
+
+    def __init__(self, factionXmlFile):
+        """
+        Load the faction.xml file in memory
+        """
+        if self.factionData == None:
+            self.factionData = ET.parse( factionXmlFile )
+
+    def findFaction(self, name):
+        """
+        return true fi the faction 'name' is found in the faction xml file
+        """
+        for faction in self.factionData.findall('faction'):
+            if faction.attrib['name'] == name:
+                return True
+        return False
+
+class Asset:
+    assetData = None
+
+    def __init__(self, assetXmlFile):
+        """
+        Load the asset.xml file in memory
+        """
+        if self.assetData == None:
+            self.assetData = ET.parse( assetXmlFile )
+
+    def findPlanet(self, name):
+        """
+        Return true if the planet 'name' is found in the asset xml file
+        """
+        for asset in self.assetData.findall('asset'):
+            if asset.attrib['name'] == name:
+                return True
+        return False
+
 class Mission:
     __currentNode__ = None
 
