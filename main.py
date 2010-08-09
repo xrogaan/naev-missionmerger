@@ -198,7 +198,7 @@ class TransformXmlToMissions:
                     if type(val) is ListType:
                         for item in val:
                             etkey = ET.SubElement(avail, key)
-                            etkey.text = val[0]
+                            etkey.text = item
                     else:
                         etkey = ET.SubElement(avail, key)
                         etkey.text = val
