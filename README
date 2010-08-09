@@ -1,0 +1,27 @@
+ A tool to merge mission informations into one file
+============================================================================
+
+Actually, to list all available mission we have an unique file (mission.xml). Which is bad, because
+we have more than one contributor to write missions. With time, that file will become a mess and it
+will be hard to maintain.
+
+ Ideas
+-------
+The two mains ideas are :
+
+1/ Write the missions information in the header comments of the lua scripts. It will provide a
+   cleaner directory. But it'll also increase the level of difficulty to retrieve the informations.
+2/ Use unique xml file with the same name as the lua file. Without an xml file, the mission would
+   be disabled.
+
+ Format
+--------
+The main format would be the xml one. But, with the decentralized nature of those files, we could
+allow people to use thier own format provided that this tool can handle it.
+
+ Where
+-------
+Each lua file needs its equal in xml.
+
+So, if you have a `dat/missions/empire/badass.lua`, you'll needs a
+`dat/missions/empire/badass.xml`.
