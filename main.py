@@ -18,7 +18,7 @@ class debug:
 
     def __init__(self, verbose=False):
         self._verbose = verbose
-    
+
     def toggleVerbose(self):
         if self._verbose:
             self._verbose = False
@@ -31,15 +31,15 @@ class debug:
 
 class Mission:
     __currentNode__ = None
-    
+
     def __init__(self, xmlfile):
         self.debug = debug()
         self.doc = parse(xmlfile)
         self.Attribs = {}
         self.Attribs["name"] = self.getRootElement().getAttribute('name')
-   
+
         self.lua = self.getRootElement().getElementsByTagName('lua')[0].childNodes[0].wholeText
-       
+
         self.flags = {'unique': None}
         try:
             self.getRootElement().getElementsByTagName('flags')[0].childNodes[1].tagName
@@ -47,14 +47,14 @@ class Mission:
             self.flags['unique'] = False
         else:
             self.flags['unique'] = True
-        
+
         self.avail = { 'chance': None,
                        'cond': None,
                        'done': None,
                        'location': [],
                        'faction': [],
                        'planet': []}
-        
+
         for availTag in self.getRootElement().getElementsByTagName('avail')[0].childNodes:
             if availTag.nodeType == availTag.TEXT_NODE:
                 continue
@@ -86,7 +86,7 @@ class Mission:
 
     def getName(self):
         return self.Attribs["name"]
-        
+
     def isUnique(self):
         return self.flags['unique']
 
@@ -107,9 +107,10 @@ class Mission:
 
 class TransformXmlToMissions:
     __missionList__ = []
-    
-    def __init__(self, localpath, debug):
+
+    def __init__(self, localpath, debug, ignore):
         self.debug = debug
+        self.ignore = ignore
         self.readXml(localpath)
 
     def readXml(self, localpath):
@@ -124,7 +125,7 @@ class TransformXmlToMissions:
                     self.__missionList__.append(Mission(filename))
                     m = None
         self.debug.p("Done")
-    
+
     def writeMissionsXml(self, output=None):
         rootxml = ET.Element('Missions')
         for mission in self.__missionList__:
@@ -160,12 +161,13 @@ class TransformXmlToMissions:
             for key, val in mission.getAvail().items():
                 print "   %s: %s" % (key, val)
             print
-    
+
     def ignore_filename(self,filename):
         root, ext = os.path.splitext(filename)
         basename = os.path.basename(filename)
         if ext in ['.pyc', '.pyo', '.backup'] \
-               or ext.endswith('~') or ext.endswith('#') or basename.startswith('.'):
+                or ext.endswith('~') or ext.endswith('#') \
+                or basename.startswith('.') or filename in self.ignore:
             return True
         return False
 
@@ -174,13 +176,19 @@ if __name__ == "__main__":
     parser = OptionParser(usage="Usage %prog [-h] [-v] [-o] <path to naev/dat/missions/>",
                           version="%prog "+__version__,
                           description='''\
-TODO: write a description
+
+TODO: write a description.
+
 Gather informational tags about missions, do a sanity check and write them in
 a big xml.
 '''
                          )
     parser.add_option("-o", "--output",
                       metavar="FILE", help="write output to FILE" )
+    parser.add_option("-i", "--ignore",
+                      action="append", default=[], metavar="FILE",
+                      help="ignore FILE. To ignore more than one file, repeat \
+                      this argument")
     parser.add_option("-v", "--verbose",
                       action="store_true", default=False)
 
@@ -189,8 +197,9 @@ a big xml.
         parser.error("incorrect number of arguments")
 
     local_path = args[0]
-    local_files = TransformXmlToMissions(local_path, debug(cfg.verbose))
-    
+    local_files = TransformXmlToMissions(local_path, debug(cfg.verbose),
+            cfg.ignore)
+
     local_files.writeMissionsXml(cfg.output)
 
 
