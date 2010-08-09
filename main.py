@@ -11,10 +11,29 @@ import re
 
 __version__ = '1.0'
 
+class debug:
+    """
+    Simple objet to help show verbose level of text.
+    """
+
+    def __init__(self, verbose=False):
+        self._verbose = verbose
+    
+    def toggleVerbose(self):
+        if self._verbose:
+            self._verbose = False
+        else:
+            self._verbose = True
+
+    def p(self, text):
+        if self._verbose:
+            print text
+
 class Mission:
     __currentNode__ = None
     
     def __init__(self, xmlfile):
+        self.debug = debug()
         self.doc = parse(xmlfile)
         self.Attribs = {}
         self.Attribs["name"] = self.getRootElement().getAttribute('name')
@@ -88,9 +107,9 @@ class Mission:
 
 class TransformXmlToMissions:
     __missionList__ = []
-    __verbose__     = True
     
-    def __init__(self, localpath):
+    def __init__(self, localpath, debug):
+        self.debug = debug
         self.readXml(localpath)
 
     def readXml(self, localpath):
@@ -101,10 +120,10 @@ class TransformXmlToMissions:
                 if self.ignore_filename(filename):
                     continue
                 if re.match(".*(\.xml)$", f):
-                    print "Processing %s" % (filename)
+                    self.debug.p("Processing %s" % (filename))
                     self.__missionList__.append(Mission(filename))
                     m = None
-        print "Done"
+        self.debug.p("Done")
     
     def writeMissionsXml(self, output=None):
         rootxml = ET.Element('Missions')
@@ -170,7 +189,7 @@ a big xml.
         parser.error("incorrect number of arguments")
 
     local_path = args[0]
-    local_files = TransformXmlToMissions(local_path)
+    local_files = TransformXmlToMissions(local_path, debug(cfg.verbose))
     
     local_files.writeMissionsXml(cfg.output)
 
