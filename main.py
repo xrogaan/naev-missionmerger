@@ -143,8 +143,8 @@ class Mission:
 
     def getAvail(self,Node=None):
         if Node != None:
-            if hasattr(self.avail, Node):
-                return self.avail.Node
+            if None in self.avail:
+                return self.avail[Node]
             else:
                 return None
         else:
